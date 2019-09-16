@@ -68,7 +68,7 @@ public final class Generator {
     private func composeMethods() throws {
         let composer = MethodsComposer(classInfoes: schema.classInfoes)
         let impl = try composer.composeEntityUtilityImplementation(
-            forEntityName: "TdClient",
+            forEntityName: "TdApi",
             projectName: "tl2swift",
             outputDirectory: outputDir.path)
         try impl.sourceCode.write(toFile: impl.filePath, atomically: false, encoding: String.Encoding.utf8)

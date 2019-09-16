@@ -18,7 +18,18 @@ class MethodsComposer: Composer {
     override func composeUtilitySourceCode() throws -> String {
         let methods = composeMethods(classInfoes: classInfoes)
         return ""
-            .addLine("class TdClient {")
+            .addLine("class TdApi {")
+            .addBlankLine()
+            .addLine("private let client: TdClient".indent())
+            .addLine("private let encoder = JSONEncoder()".indent())
+            .addLine("private let decoder = JSONDecoder()".indent())
+            .addBlankLine()
+            .addLine("init(client: TdClient) {".indent())
+            .addLine("self.client = client".indent().indent())
+            .addLine("self.encoder.keyDecodingStrategy = .convertFromSnakeCase".indent().indent())
+            .addLine("self.decoder.keyEncodingStrategy = .convertToSnakeCase".indent().indent())
+            .addLine("}".indent())
+            .addBlankLine()
             .addBlankLine()
             .append(methods.indent())
             .addLine("}")
@@ -37,15 +48,58 @@ class MethodsComposer: Composer {
         for param in info.properties {
             let type = TlHelper.getType(param.type)
             let paramName = TlHelper.maskSwiftKeyword(param.name.underscoreToCamelCase())
-            paramsList.append("\(paramName): \(type)")
+            paramsList.append("\(paramName): \(type),")
         }
-        let params = paramsList.isEmpty ? "" : (paramsList.joined(separator: ", ") + ", ")
+        paramsList.append("completion: @escaping (Result<\(info.rootName), Error>) -> Void")
+        
+        var result = composeComment(info)
+        if paramsList.count > 1 {
+            let params = paramsList.reduce("", { $0.addLine("\($1)".indent()) })
+            result = result
+                .addLine("func \(info.name)(")
+                .append(String(params.dropLast()))
+                .addLine(") throws {")
+        } else {
+            result = result.addLine("func \(info.name)(\(paramsList.first!)) throws {")
+        }
+        
         // TODO: add documentation comment
-        return ""
-            .addLine("func \(info.name)(\(params)completion: @escaping (\(info.rootName)) -> Void) {")
+        let impl = composeMethodImpl(info)
+        result = result
+            .addBlankLine()
+            .append(impl.indent())
             .addLine("}")
             .addBlankLine()
+        
+        return result
     }
     
-}
+    private func composeComment(_ info: ClassInfo) -> String {
+        var result = "/// \(info.description)\n"
+        for param in info.properties {
+            let paramName = TlHelper.maskSwiftKeyword(param.name.underscoreToCamelCase())
+            result = result.addLine("/// - Parameter \(paramName): \(param.description ?? "")")
+        }
+        return result
+    }
+    
+    private func composeMethodImpl(_ info: ClassInfo) -> String  {
+        var result = ""
+            .addLine("let query: [String: Any] = [")
+            .addLine("\"@type\": \"\(info.name)\"".indent())
+            
+        for param in info.properties {
+            let paramValue = TlHelper.maskSwiftKeyword(param.name.underscoreToCamelCase())
+            result = result.addLine("\"\(param.name)\": \(paramValue)".indent())
+        }
 
+        return result
+            .addLine("]")
+            .addLine("let data = try encoder.encode(query)")
+            .addLine("client.queryAsync(query: data) { [weak self] result in")
+            .addLine("guard let `self` = self else { return }")
+            .addLine("let response = self.decoder.tryDecode(\(info.rootName), from result)".indent())
+            .addLine("completion(response)".indent())
+            .addLine("}")
+    }
+}
