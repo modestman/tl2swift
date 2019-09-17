@@ -46,7 +46,7 @@ public final class Generator {
     
     public func composeStructs() throws {
         let structs = findClassesNotAssociatedWithEnums()
-        for classInfo in structs where !classInfo.isFunction {
+        for classInfo in structs /* where !classInfo.isFunction */ {
             let composer = StructComposer(classInfo: classInfo)
             let impl = try composer.composeEntityUtilityImplementation(
                 forEntityName: classInfo.name.capitalizedFirstLetter,

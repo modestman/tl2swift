@@ -40,7 +40,7 @@ class CommonTypesComposer: Composer {
     private func composeJsonDecoderExtension() -> String {
         return ""
             .addLine("extension JSONDecoder {")
-            .addLine("    func tryDecode<T>(_ type: T.Type, from data: Data) -> Result<T, Error> where T : Decodable {")
+            .addLine("    func tryDecode<T>(_ type: T.Type, from data: Data) -> Result<T, Swift.Error> where T : Decodable {")
             .addLine("        do {")
             .addLine("            let result = try self.decode(type, from: data)")
             .addLine("            return .success(result)")

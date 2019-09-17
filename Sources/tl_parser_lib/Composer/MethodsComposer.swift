@@ -26,8 +26,8 @@ class MethodsComposer: Composer {
             .addBlankLine()
             .addLine("init(client: TdClient) {".indent())
             .addLine("self.client = client".indent().indent())
-            .addLine("self.encoder.keyDecodingStrategy = .convertFromSnakeCase".indent().indent())
-            .addLine("self.decoder.keyEncodingStrategy = .convertToSnakeCase".indent().indent())
+            .addLine("self.encoder.keyEncodingStrategy = .convertToSnakeCase".indent().indent())
+            .addLine("self.decoder.keyDecodingStrategy = .convertFromSnakeCase".indent().indent())
             .addLine("}".indent())
             .addBlankLine()
             .addBlankLine()
@@ -50,7 +50,7 @@ class MethodsComposer: Composer {
             let paramName = TlHelper.maskSwiftKeyword(param.name.underscoreToCamelCase())
             paramsList.append("\(paramName): \(type),")
         }
-        paramsList.append("completion: @escaping (Result<\(info.rootName), Error>) -> Void")
+        paramsList.append("completion: @escaping (Result<\(info.rootName), Swift.Error>) -> Void")
         
         var result = composeComment(info)
         if paramsList.count > 1 {
@@ -84,21 +84,26 @@ class MethodsComposer: Composer {
     }
     
     private func composeMethodImpl(_ info: ClassInfo) -> String  {
+        let structName = info.name.capitalizedFirstLetter
         var result = ""
-            .addLine("let query: [String: Any] = [")
-            .addLine("\"@type\": \"\(info.name)\"".indent())
-            
-        for param in info.properties {
-            let paramValue = TlHelper.maskSwiftKeyword(param.name.underscoreToCamelCase())
-            result = result.addLine("\"\(param.name)\": \(paramValue)".indent())
+        if info.properties.isEmpty {
+            result = result.addLine("let query = \(structName)()")
+        } else {
+            result = result.addLine("let query = \(structName)(")
+            for param in info.properties {
+                let paramName = param.name.underscoreToCamelCase()
+                let paramValue = TlHelper.maskSwiftKeyword(param.name.underscoreToCamelCase())
+                result = result.addLine("\(paramName): \(paramValue),".indent())
+            }
+            result = String(result.dropLast().dropLast())
+            result = result.addBlankLine().addLine(")")
         }
 
         return result
-            .addLine("]")
             .addLine("let data = try encoder.encode(query)")
             .addLine("client.queryAsync(query: data) { [weak self] result in")
             .addLine("guard let `self` = self else { return }")
-            .addLine("let response = self.decoder.tryDecode(\(info.rootName), from result)".indent())
+            .addLine("let response = self.decoder.tryDecode(\(info.rootName).self, from: result)".indent())
             .addLine("completion(response)".indent())
             .addLine("}")
     }

@@ -24,11 +24,13 @@ class StructComposer: Composer {
     private func composeStruct(classInfo: ClassInfo) -> String {
         let structName = classInfo.name.capitalizedFirstLetter
         let props = composeStructProperties(classInfo.properties)
+        let codable = classInfo.isFunction ? composeCodable(classInfo) : ""
         return ""
             .addLine("/// \(classInfo.description)")
-            .addLine("struct \(structName): Codable {")
+            .addLine("struct \(structName): \(classInfo.isFunction ? "Encodable" : "Codable") {")
             .addBlankLine()
             .append(props.indent())
+            .append(codable.indent())
             .addLine("}")
             .addBlankLine()
     }
@@ -48,5 +50,47 @@ class StructComposer: Composer {
         return result
     }
     
+    private func composeCodable(_ classInfo: ClassInfo) -> String {
+        let codingKeys = composeCodingKeys(classInfo.properties)
+        let encoder = composeEncoder(classInfo.properties)
+        return ""
+            .addLine("let _type = \"\(classInfo.name)\"")
+            .addLine("var _extra: String? = nil")
+            .addBlankLine()
+            .append(codingKeys)
+            .addBlankLine()
+            .append(encoder)
+    }
+    
+    private func composeCodingKeys(_ properties: [ClassProperty]) -> String {
+        var result = ""
+            .addLine("private enum CodingKeys: String, CodingKey {")
+            .addLine("case _type = \"@type\"".indent())
+            .addLine("case _extra = \"@extra\"".indent())
+        
+        for propertyInfo in properties {
+            let caseName = TlHelper.maskSwiftKeyword(propertyInfo.name.underscoreToCamelCase())
+            let caseValue = propertyInfo.name
+            result = result
+                .addLine("case \(caseName) = \"\(caseValue)\"".indent())
+        }
+        return result.addLine("}")
+    }
+    
+    private func composeEncoder(_ properties: [ClassProperty]) -> String {
+        var result = ""
+            .addLine("public func encode(to encoder: Encoder) throws {")
+            .addLine("var container = encoder.container(keyedBy: CodingKeys.self)".indent())
+            .addLine("try container.encode(_type, forKey: ._type)".indent())
+            .addLine("try container.encodeIfPresent(_extra, forKey: ._extra)".indent())
+        
+        for propertyInfo in properties {
+            let propName = TlHelper.maskSwiftKeyword(propertyInfo.name.underscoreToCamelCase())
+            result = result
+                .addLine("try container.encode(\(propName), forKey: .\(propName))".indent())
+        }
+        
+        return result.addLine("}")
+    }
     
 }
