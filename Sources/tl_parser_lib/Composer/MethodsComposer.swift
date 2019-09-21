@@ -20,9 +20,9 @@ class MethodsComposer: Composer {
         return ""
             .addLine("class TdApi {")
             .addBlankLine()
-            .addLine("private let client: TdClient".indent())
-            .addLine("private let encoder = JSONEncoder()".indent())
-            .addLine("private let decoder = JSONDecoder()".indent())
+            .addLine("let client: TdClient".indent())
+            .addLine("let encoder = JSONEncoder()".indent())
+            .addLine("let decoder = JSONDecoder()".indent())
             .addBlankLine()
             .addLine("init(client: TdClient) {".indent())
             .addLine("self.client = client".indent().indent())
@@ -46,7 +46,7 @@ class MethodsComposer: Composer {
     private func composeMethod(_ info: ClassInfo) -> String {
         var paramsList = [String]()
         for param in info.properties {
-            let type = TlHelper.getType(param.type)
+            let type = TlHelper.getType(param.type, optional: param.optional)
             let paramName = TlHelper.maskSwiftKeyword(param.name.underscoreToCamelCase())
             paramsList.append("\(paramName): \(type),")
         }
@@ -100,11 +100,11 @@ class MethodsComposer: Composer {
         }
 
         return result
-            .addLine("let data = try encoder.encode(query)")
-            .addLine("client.queryAsync(query: data) { [weak self] result in")
-            .addLine("guard let `self` = self else { return }")
-            .addLine("let response = self.decoder.tryDecode(\(info.rootName).self, from: result)".indent())
-            .addLine("completion(response)".indent())
+            .addLine("let dto = DTO(query, encoder: self.encoder)")
+            .addLine("client.queryAsync(query: dto) { [weak self] result in")
+            .addLine("guard let `self` = self else { return }".indent())
+            .addLine("let response = self.decoder.tryDecode(DTO<\(info.rootName)>.self, from: result)".indent())
+            .addLine("completion(response.map { $0.payload })".indent())
             .addLine("}")
     }
 }

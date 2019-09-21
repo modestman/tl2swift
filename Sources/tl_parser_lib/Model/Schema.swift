@@ -10,6 +10,7 @@ struct ClassProperty: Hashable {
     let name: String
     let type: String
     let description: String?
+    let optional: Bool
 }
 
 struct InterfaceInfo: Hashable {

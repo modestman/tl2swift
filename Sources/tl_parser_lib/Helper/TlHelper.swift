@@ -9,18 +9,20 @@ import Foundation
 
 struct TlHelper {
     
-    static func getType(_ tlType: String) -> String {
+    static func getType(_ tlType: String, optional: Bool = false) -> String {
+        let resultType: String
         if tlType.hasPrefix("vector") {
             let startIdx = tlType.firstIndex(of: "<")  ?? tlType.startIndex
             let endIdx = tlType.lastIndex(of: ">") ?? tlType.endIndex
             let innerType = String(tlType[tlType.index(after: startIdx)..<endIdx])
-            return "[\(getType(innerType))]"
+            resultType = "[\(getType(innerType))]"
         } else if let primitive = mapPrimitiveType(tlType) {
-            return primitive
+            resultType = primitive
         } else {
             // object type
-            return tlType.capitalizedFirstLetter
+            resultType = tlType.capitalizedFirstLetter
         }
+        return optional ? "\(resultType)?" : resultType
     }
     
     static func mapPrimitiveType(_ tlType: String) -> String? {
@@ -30,7 +32,7 @@ struct TlHelper {
             "double": "Double",
             "int32": "Int",
             "int53": "Int64",
-            "int64": "Int64",
+            "int64": "String", // for decoding json
             "bytes": "Data"
         ]
         return mapping[tlType]

@@ -78,7 +78,8 @@ public final class Parser {
                 var properties = [ClassProperty]()
                 for (name, type) in entityNameAndTypes.types {
                     let desc = entityDesc.params[name]
-                    let prop = ClassProperty(name: name, type: type, description: desc)
+                    let optional = desc?.contains("may be null") ?? false
+                    let prop = ClassProperty(name: name, type: type, description: desc, optional: optional)
                     properties.append(prop)
                 }
                 properties.sort(by: { $0.name < $1.name })

@@ -24,13 +24,11 @@ class StructComposer: Composer {
     private func composeStruct(classInfo: ClassInfo) -> String {
         let structName = classInfo.name.capitalizedFirstLetter
         let props = composeStructProperties(classInfo.properties)
-        let codable = classInfo.isFunction ? composeCodable(classInfo) : ""
         return ""
             .addLine("/// \(classInfo.description)")
-            .addLine("struct \(structName): \(classInfo.isFunction ? "Encodable" : "Codable") {")
+            .addLine("struct \(structName): Codable {")
             .addBlankLine()
             .append(props.indent())
-            .append(codable.indent())
             .addLine("}")
             .addBlankLine()
     }
@@ -41,7 +39,7 @@ class StructComposer: Composer {
             if let comment = propertyInfo.description {
                 result = result.addLine("/// \(comment)")
             }
-            let type = TlHelper.getType(propertyInfo.type)
+            let type = TlHelper.getType(propertyInfo.type, optional: propertyInfo.optional)
             let propertyName = TlHelper.maskSwiftKeyword(propertyInfo.name.underscoreToCamelCase())
             result = result
                 .addLine("let \(propertyName): \(type)")
