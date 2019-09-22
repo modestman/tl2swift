@@ -1,19 +1,17 @@
 //
 //  Implementation.swift
-//  ModelCompiler
+//  tl_parser_lib
 //
-//  Created by Egor Taflanidi on 09.03.29.
-//  Copyright © 29 Heisei RedMadRobot LLC. All rights reserved.
+//  Created by Anton Glezman on 22/09/2019.
 //
 
 
 import Foundation
 
-
 /**
  Source code implementation.
  
- After compilation, `Klass` instances are used to generate utilities. Generated source code of these
+ After parsing tl-schema file, `Schema` instance used to generate utilities. Generated source code of these
  utilities is organised into `Implementation` instances.
  */
 public struct Implementation: Equatable {

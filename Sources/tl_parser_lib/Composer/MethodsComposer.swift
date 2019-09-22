@@ -7,18 +7,27 @@
 
 import Foundation
 
-class MethodsComposer: Composer {
+final class MethodsComposer: Composer {
+    
+    // MARK: - Private properties
     
     private let classInfoes: [ClassInfo]
+    
+    
+    // MARK: - Init
     
     init(classInfoes: [ClassInfo]) {
         self.classInfoes = classInfoes
     }
     
+    
+    // MARK: - Override
+    
     override func composeUtilitySourceCode() throws -> String {
         let methods = composeMethods(classInfoes: classInfoes)
+        let executeFunc = composeExecuteFunc()
         return ""
-            .addLine("class TdApi {")
+            .addLine("final class TdApi {")
             .addBlankLine()
             .addLine("let client: TdClient".indent())
             .addLine("let encoder = JSONEncoder()".indent())
@@ -32,8 +41,13 @@ class MethodsComposer: Composer {
             .addBlankLine()
             .addBlankLine()
             .append(methods.indent())
+            .addBlankLine()
+            .append(executeFunc.indent())
             .addLine("}")
     }
+    
+    
+    // MARK: - Private methods
     
     private func composeMethods(classInfoes: [ClassInfo]) -> String {
         var result = ""
@@ -46,8 +60,8 @@ class MethodsComposer: Composer {
     private func composeMethod(_ info: ClassInfo) -> String {
         var paramsList = [String]()
         for param in info.properties {
-            let type = TlHelper.getType(param.type, optional: param.optional)
-            let paramName = TlHelper.maskSwiftKeyword(param.name.underscoreToCamelCase())
+            let type = TypesHelper.getType(param.type, optional: param.optional)
+            let paramName = TypesHelper.maskSwiftKeyword(param.name.underscoreToCamelCase())
             paramsList.append("\(paramName): \(type),")
         }
         paramsList.append("completion: @escaping (Result<\(info.rootName), Swift.Error>) -> Void")
@@ -63,7 +77,6 @@ class MethodsComposer: Composer {
             result = result.addLine("func \(info.name)(\(paramsList.first!)) throws {")
         }
         
-        // TODO: add documentation comment
         let impl = composeMethodImpl(info)
         result = result
             .addBlankLine()
@@ -77,7 +90,7 @@ class MethodsComposer: Composer {
     private func composeComment(_ info: ClassInfo) -> String {
         var result = "/// \(info.description)\n"
         for param in info.properties {
-            let paramName = TlHelper.maskSwiftKeyword(param.name.underscoreToCamelCase())
+            let paramName = TypesHelper.maskSwiftKeyword(param.name.underscoreToCamelCase())
             result = result.addLine("/// - Parameter \(paramName): \(param.description ?? "")")
         }
         return result
@@ -92,19 +105,29 @@ class MethodsComposer: Composer {
             result = result.addLine("let query = \(structName)(")
             for param in info.properties {
                 let paramName = param.name.underscoreToCamelCase()
-                let paramValue = TlHelper.maskSwiftKeyword(param.name.underscoreToCamelCase())
+                let paramValue = TypesHelper.maskSwiftKeyword(param.name.underscoreToCamelCase())
                 result = result.addLine("\(paramName): \(paramValue),".indent())
             }
             result = String(result.dropLast().dropLast())
             result = result.addBlankLine().addLine(")")
         }
 
-        return result
-            .addLine("let dto = DTO(query, encoder: self.encoder)")
-            .addLine("client.queryAsync(query: dto) { [weak self] result in")
-            .addLine("guard let `self` = self else { return }".indent())
-            .addLine("let response = self.decoder.tryDecode(DTO<\(info.rootName)>.self, from: result)".indent())
-            .addLine("completion(response.map { $0.payload })".indent())
+        return result.addLine("execute(query: query, completion: completion)")
+    }
+    
+    private func composeExecuteFunc() -> String {
+        return ""
+            .addLine("private func execute<Q, R>(")
+            .addLine("    query: Q,")
+            .addLine("    completion: @escaping (Result<R, Swift.Error>) -> Void)")
+            .addLine("    where Q: Codable, R: Codable {")
+            .addBlankLine()
+            .addLine("    let dto = DTO(query, encoder: self.encoder)")
+            .addLine("    client.queryAsync(query: dto) { [weak self] result in")
+            .addLine("        guard let `self` = self else { return }")
+            .addLine("        let response = self.decoder.tryDecode(DTO<R>.self, from: result)")
+            .addLine("        completion(response.map { $0.payload })")
+            .addLine("    }")
             .addLine("}")
     }
 }

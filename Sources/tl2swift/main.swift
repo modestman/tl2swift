@@ -5,10 +5,9 @@ import tl_parser_lib
 let args = ProcessInfo.processInfo.arguments
 
 guard args.count >= 2 else {
-    fatalError("Wrong arguments count")
+    preconditionFailure("Invalid number of arguments")
 }
 
-let fileManager = FileManager.default
 let inFile = Path(args[1])
 let outPath = args.count > 2 ? Path(args[2]) : Path.current
 
@@ -21,5 +20,5 @@ guard let schema = parser.parse() else {
     exit(1)
 }
 
-let generator = Generator(schema: schema, outputDir: outPath.url)
-try! generator.run()
+let app = Application(schema: schema, outputDir: outPath.url)
+exit(app.run())

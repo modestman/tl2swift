@@ -18,15 +18,13 @@ import Foundation
  */
 open class Composer {
     
-    /**
-     Compose utility class source code.
-     
-     - parameter entityKlass: entity class model for which utility should be composed;
-     - parameter entityKlasses: other entity classes available in scope;
-     - parameter projectName: project name.
-     
-     - returns: `Implementation` object with utility class source code and filename.
-     */
+    /// Compose utility class source code.
+    ///
+    /// - Parameter entityName: Entity name used for determine the file name
+    /// - Parameter projectName: Project name used for file header comment
+    /// - Parameter outputDirectory: Directory where the result should be saved
+    ///
+    /// - Returns: `Implementation` object with utility class source code and filename.
     public func composeEntityUtilityImplementation(
         forEntityName entityName: String,
         projectName: String,
@@ -46,23 +44,13 @@ open class Composer {
         )
     }
     
-    /**
-     Compose utility class filename.
-     
-     - parameter entityKlass: entity class model for which utility is composed.
-     
-     - returns: By default, returns entity class name + "Util.swift".
-     */
-    open func composeEntityUtilityFilename(_ filename: String) -> String {
-        return "\(filename).swift"
+    /// Compose utility class filename.
+    open func composeEntityUtilityFilename(_ entityName: String) -> String {
+        return "\(entityName).swift"
     }
     
-    /**
-     Compose copytight comment header.
-     
-     - returns: Comment with project & file names, "Created by Code Generator" and
-     "Copyright RedMadRobot".
-     */
+    /// Compose copytight comment header.
+    /// - returns: Comment with project & file names, "Created by Code Generator"
     open func composeCopyrightComment(forFilename filename: String, project: String) -> String {
         return ""
             .addLine("//")
@@ -73,24 +61,15 @@ open class Composer {
             .addLine("//")
     }
     
-    /**
-     Compose import declarations.
-     
-     - returns: `import Foundation` by default.
-     */
+    /// Compose import declarations.
+    /// - returns: `import Foundation` by default.
     open func composeImports() -> String {
         return ""
             .addLine("import Foundation")
     }
     
-    /**
-     Abstract method to compose utility class source code.
-     
-     - parameter entityKlass: entity class model for which utility is composed;
-     - parameter entityKlasses: other entity classes available in scope.
-     
-     - returns: Utility class body source code withoud class declaration.
-     */
+    /// Abstract method to compose utility class source code.
+    /// - returns: Utility class body source code withoud class declaration.
     open func composeUtilitySourceCode() throws -> String {
         return ""
     }

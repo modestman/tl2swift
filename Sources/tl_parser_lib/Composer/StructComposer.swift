@@ -7,19 +7,28 @@
 
 import Foundation
 
-class StructComposer: Composer {
+final class StructComposer: Composer {
+    
+    // MARK: - Private properties
     
     private let classInfo: ClassInfo
     
+    
+    // MARK: - Init
     
     init(classInfo: ClassInfo) {
         self.classInfo = classInfo
     }
     
+    
+    // MARK: - Override
+    
     override func composeUtilitySourceCode() throws -> String {
         return composeStruct(classInfo: self.classInfo)
     }
     
+    
+    // MARK: - Private methods
     
     private func composeStruct(classInfo: ClassInfo) -> String {
         let structName = classInfo.name.capitalizedFirstLetter
@@ -39,8 +48,8 @@ class StructComposer: Composer {
             if let comment = propertyInfo.description {
                 result = result.addLine("/// \(comment)")
             }
-            let type = TlHelper.getType(propertyInfo.type, optional: propertyInfo.optional)
-            let propertyName = TlHelper.maskSwiftKeyword(propertyInfo.name.underscoreToCamelCase())
+            let type = TypesHelper.getType(propertyInfo.type, optional: propertyInfo.optional)
+            let propertyName = TypesHelper.maskSwiftKeyword(propertyInfo.name.underscoreToCamelCase())
             result = result
                 .addLine("let \(propertyName): \(type)")
                 .addBlankLine()
@@ -67,7 +76,7 @@ class StructComposer: Composer {
             .addLine("case _extra = \"@extra\"".indent())
         
         for propertyInfo in properties {
-            let caseName = TlHelper.maskSwiftKeyword(propertyInfo.name.underscoreToCamelCase())
+            let caseName = TypesHelper.maskSwiftKeyword(propertyInfo.name.underscoreToCamelCase())
             let caseValue = propertyInfo.name
             result = result
                 .addLine("case \(caseName) = \"\(caseValue)\"".indent())
@@ -83,7 +92,7 @@ class StructComposer: Composer {
             .addLine("try container.encodeIfPresent(_extra, forKey: ._extra)".indent())
         
         for propertyInfo in properties {
-            let propName = TlHelper.maskSwiftKeyword(propertyInfo.name.underscoreToCamelCase())
+            let propName = TypesHelper.maskSwiftKeyword(propertyInfo.name.underscoreToCamelCase())
             result = result
                 .addLine("try container.encode(\(propName), forKey: .\(propName))".indent())
         }

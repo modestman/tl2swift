@@ -7,20 +7,23 @@
 
 import Foundation
 
-class EnumComposer: Composer {
+final class EnumComposer: Composer {
+    
+    // MARK: - Private properties
     
     private let enumInfo: EnumInfo
     private let schema: Schema
     
+    
+    // MARK: - Init
+    
     init(enumInfo: EnumInfo, schema: Schema) {
         self.enumInfo = enumInfo
         self.schema = schema
-        
-//        var enums = enumInfo
-//        enums.items.sort(by: { $0.name < $1.name })
-//        self.enumInfo = enums
     }
     
+    
+    // MARK: - Override
     
     override public func composeUtilitySourceCode() throws -> String {
         let indirect = isIndirect(enumInfo.enumType) ? "indirect " : ""
@@ -45,6 +48,9 @@ class EnumComposer: Composer {
             .addBlankLine()
             .append(structs)
     }
+    
+    
+    // MARK: - Private methods
     
     private func composeCaseItems(_ items: [EnumItem]) -> String {
         var result = ""
@@ -72,7 +78,7 @@ class EnumComposer: Composer {
         let cases = composeDecoderCases(items)
         return ""
             .addLine("public init(from decoder: Decoder) throws {")
-            .addLine("let container = try decoder.container(keyedBy: TdLibTypeCodingKeys.self)".indent())
+            .addLine("let container = try decoder.container(keyedBy: DtoCodingKeys.self)".indent())
             .addLine("let type = try container.decode(Kind.self, forKey: .type)".indent())
             .addLine("switch type {".indent())
             .append(cases.indent())
@@ -98,7 +104,7 @@ class EnumComposer: Composer {
         let cases = composeEncoderCases(items)
         return ""
             .addLine("public func encode(to encoder: Encoder) throws {")
-            .addLine("var container = encoder.container(keyedBy: TdLibTypeCodingKeys.self)".indent())
+            .addLine("var container = encoder.container(keyedBy: DtoCodingKeys.self)".indent())
             .addLine("switch self {".indent())
             .append(cases.indent())
             .addLine("}".indent())

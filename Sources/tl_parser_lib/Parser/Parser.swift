@@ -23,6 +23,11 @@ public final class Parser {
         var root: String
     }
     
+    private struct InterfaceInfo: Hashable {
+        let name: String
+        let description: String
+    }
+    
     
     // MARK: - Private properties
     
@@ -59,7 +64,6 @@ public final class Parser {
             
             if line.hasPrefix("//@class") {
                 let interface = parseClassDeclaration(line)
-                schema.interfaceInfoes.append(interface)
                 let enumInfo = EnumInfo(enumType: "\(interface.name)", items: [], description: interface.description)
                 schema.enumInfoes.append(enumInfo)
                 

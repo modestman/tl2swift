@@ -1,3 +1,16 @@
+//
+//  Schema.swift
+//  tl_parser_lib
+//
+//  Created by Anton Glezman on 22/09/2019.
+//
+
+public final class Schema {
+    var classInfoes: [ClassInfo] = []
+    var enumInfoes: [EnumInfo] = []
+}
+
+
 struct ClassInfo: Hashable {
     let name: String
     let properties: [ClassProperty]
@@ -13,14 +26,9 @@ struct ClassProperty: Hashable {
     let optional: Bool
 }
 
-struct InterfaceInfo: Hashable {
-    let name: String
-    let description: String
-}
-
 struct EnumInfo: Hashable {
     let enumType: String
-    var items: [EnumItem] // Case name and associated value
+    var items: [EnumItem]
     let description: String
 }
 
@@ -28,13 +36,4 @@ struct EnumItem: Hashable {
     let name: String
     let associatedClassName: String?
     let description: String
-}
-
-
-public final class Schema {
-    
-    var classInfoes: [ClassInfo] = []
-    var interfaceInfoes: [InterfaceInfo] = []
-    var enumInfoes: [EnumInfo] = []
-    
 }

@@ -7,8 +7,11 @@
 
 import Foundation
 
-struct TlHelper {
+struct TypesHelper {
     
+    /// Convert TL type to corresponding Swift type
+    /// - Parameter tlType: TL type
+    /// - Parameter optional: can be optional
     static func getType(_ tlType: String, optional: Bool = false) -> String {
         let resultType: String
         if tlType.hasPrefix("vector") {
@@ -19,27 +22,28 @@ struct TlHelper {
         } else if let primitive = mapPrimitiveType(tlType) {
             resultType = primitive
         } else {
-            // object type
             resultType = tlType.capitalizedFirstLetter
         }
         return optional ? "\(resultType)?" : resultType
     }
     
-    static func mapPrimitiveType(_ tlType: String) -> String? {
+    private static func mapPrimitiveType(_ tlType: String) -> String? {
         let mapping = [
             "Bool": "Bool",
             "string": "String",
             "double": "Double",
             "int32": "Int",
             "int53": "Int64",
-            "int64": "String", // for decoding json
+            "int64": "String", // in TDLib json int64 passes as string
             "bytes": "Data"
         ]
         return mapping[tlType]
     }
     
+    /// Masking keywords for using as struct properties or parameters
+    /// - returns: \`keyword\`
     static func maskSwiftKeyword(_ keyword: String) -> String {
-        let keywords = ["protocol", "class", "struct", "enum"]
+        let keywords = ["protocol", "class", "struct", "enum", "func"]
         if keywords.contains(keyword) {
             return "`\(keyword)`"
         }
