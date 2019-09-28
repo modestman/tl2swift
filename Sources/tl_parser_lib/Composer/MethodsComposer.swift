@@ -27,13 +27,13 @@ final class MethodsComposer: Composer {
         let methods = composeMethods(classInfoes: classInfoes)
         let executeFunc = composeExecuteFunc()
         return ""
-            .addLine("final class TdApi {")
+            .addLine("public final class TdApi {")
             .addBlankLine()
-            .addLine("let client: TdClient".indent())
-            .addLine("let encoder = JSONEncoder()".indent())
-            .addLine("let decoder = JSONDecoder()".indent())
+            .addLine("public let client: TdClient".indent())
+            .addLine("public let encoder = JSONEncoder()".indent())
+            .addLine("public let decoder = JSONDecoder()".indent())
             .addBlankLine()
-            .addLine("init(client: TdClient) {".indent())
+            .addLine("public init(client: TdClient) {".indent())
             .addLine("self.client = client".indent().indent())
             .addLine("self.encoder.keyEncodingStrategy = .convertToSnakeCase".indent().indent())
             .addLine("self.decoder.keyDecodingStrategy = .convertFromSnakeCase".indent().indent())
@@ -70,11 +70,11 @@ final class MethodsComposer: Composer {
         if paramsList.count > 1 {
             let params = paramsList.reduce("", { $0.addLine("\($1)".indent()) })
             result = result
-                .addLine("func \(info.name)(")
+                .addLine("public func \(info.name)(")
                 .append(String(params.dropLast()))
                 .addLine(") throws {")
         } else {
-            result = result.addLine("func \(info.name)(\(paramsList.first!)) throws {")
+            result = result.addLine("public func \(info.name)(\(paramsList.first!)) throws {")
         }
         
         let impl = composeMethodImpl(info)

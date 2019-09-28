@@ -13,7 +13,7 @@ final class ClientProtocolComposer: Composer {
     override func composeUtilitySourceCode() throws -> String {
         return ""
             .addLine("/// Basic protocol for communicate with TdLib.")
-            .addLine("protocol TdClient {")
+            .addLine("public protocol TdClient {")
             .addBlankLine()
             .addLine("    /// Receives incoming updates and request responses from the TDLib client")
             .addLine("    func run(updateHandler: @escaping (Data) -> Void)")
@@ -27,7 +27,7 @@ final class ClientProtocolComposer: Composer {
             .addLine("}")
             .addBlankLine()
             .addBlankLine()
-            .addLine("protocol TdQuery {")
+            .addLine("public protocol TdQuery {")
             .addBlankLine()
             .addLine("    func make(with extra: String?) throws -> Data")
             .addBlankLine()

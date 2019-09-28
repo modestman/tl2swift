@@ -33,11 +33,14 @@ final class StructComposer: Composer {
     private func composeStruct(classInfo: ClassInfo) -> String {
         let structName = classInfo.name.capitalizedFirstLetter
         let props = composeStructProperties(classInfo.properties)
+        let structInit = composeInit(classInfo.properties)
         return ""
             .addLine("/// \(classInfo.description)")
-            .addLine("struct \(structName): Codable {")
+            .addLine("public struct \(structName): Codable {")
             .addBlankLine()
             .append(props.indent())
+            .addBlankLine()
+            .append(structInit.indent())
             .addLine("}")
             .addBlankLine()
     }
@@ -51,11 +54,45 @@ final class StructComposer: Composer {
             let type = TypesHelper.getType(propertyInfo.type, optional: propertyInfo.optional)
             let propertyName = TypesHelper.maskSwiftKeyword(propertyInfo.name.underscoreToCamelCase())
             result = result
-                .addLine("let \(propertyName): \(type)")
+                .addLine("public let \(propertyName): \(type)")
                 .addBlankLine()
         }
         return result
     }
+    
+    private func composeInit(_ properties: [ClassProperty]) -> String {
+        var paramsList = [String]()
+        var paramNames = [String]()
+        for param in properties {
+            let type = TypesHelper.getType(param.type, optional: param.optional)
+            let paramName = TypesHelper.maskSwiftKeyword(param.name.underscoreToCamelCase())
+            paramsList.append("\(paramName): \(type)")
+            paramNames.append(paramName)
+        }
+        
+        var result = ""
+        if paramsList.count > 1 {
+            let params = paramsList.reduce("", { $0.addLine("\($1),".indent()) })
+            result = result
+                .addLine("public init (")
+                .append(String(params.dropLast().dropLast())) // remove \n and ,
+                .addLine(") {")
+                .addBlankLine()
+        } else if paramsList.count == 1  {
+            result = result.addLine("public init (\(paramsList.first!)) {")
+        } else {
+            result = result.addLine("public init () {")
+        }
+        
+        for param in paramNames {
+            result = result.addLine("self.\(param) = \(param)".indent())
+        }
+        
+        return result.addLine("}")
+    }
+    
+    
+    // MARK: - Not used
     
     private func composeCodable(_ classInfo: ClassInfo) -> String {
         let codingKeys = composeCodingKeys(classInfo.properties)

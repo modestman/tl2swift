@@ -77,7 +77,12 @@ public final class Application {
             projectName: Constants.project,
             outputDirectory: output.path)
         
-        return [dto, decoder, codingKeys]
+        let logger = try LoggerCimposer().composeEntityUtilityImplementation(
+            forEntityName: "Logger",
+            projectName: Constants.project,
+            outputDirectory: output.path)
+        
+        return [dto, decoder, codingKeys, logger]
     }
     
     private func enumsImplementation(output: URL) throws -> [Implementation] {
