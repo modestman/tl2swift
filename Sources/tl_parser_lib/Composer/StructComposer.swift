@@ -32,11 +32,12 @@ final class StructComposer: Composer {
     
     private func composeStruct(classInfo: ClassInfo) -> String {
         let structName = classInfo.name.capitalizedFirstLetter
+        let protocols = protocolConformance(for: structName)
         let props = composeStructProperties(classInfo.properties)
         let structInit = composeInit(classInfo.properties)
         return ""
             .addLine("/// \(classInfo.description)")
-            .addLine("public struct \(structName): Codable {")
+            .addLine("public struct \(structName): \(protocols) {")
             .addBlankLine()
             .append(props.indent())
             .addBlankLine()
@@ -89,6 +90,13 @@ final class StructComposer: Composer {
         }
         
         return result.addLine("}")
+    }
+    
+    private func protocolConformance(for structName: String) -> String {
+        if structName == "Error" {
+            return "Codable, Swift.Error"
+        }
+        return "Codable"
     }
     
     

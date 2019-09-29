@@ -123,7 +123,7 @@ final class MethodsComposer: Composer {
             .addLine("    where Q: Codable, R: Codable {")
             .addBlankLine()
             .addLine("    let dto = DTO(query, encoder: self.encoder)")
-            .addLine("    client.queryAsync(query: dto) { [weak self] result in")
+            .addLine("    client.send(query: dto) { [weak self] result in")
             .addLine("        guard let `self` = self else { return }")
             .addLine("        let response = self.decoder.tryDecode(DTO<R>.self, from: result)")
             .addLine("        completion(response.map { $0.payload })")
