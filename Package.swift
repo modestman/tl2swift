@@ -14,11 +14,11 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "tl_parser_lib",
+            name: "TlParserLib",
             dependencies: ["PathKit"]),
         .target(
             name: "tl2swift",
-            dependencies: ["tl_parser_lib"]),
+            dependencies: ["TlParserLib"]),
         .testTarget(
             name: "tl2swiftTests",
             dependencies: ["tl2swift"]),

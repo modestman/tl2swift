@@ -28,9 +28,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "tl2swift::tl_parser_lib"
-               BuildableName = "tl_parser_lib.framework"
-               BlueprintName = "tl_parser_lib"
+               BlueprintIdentifier = "tl2swift::TlParserLib"
+               BuildableName = "TlParserLib.framework"
+               BlueprintName = "TlParserLib"
                ReferencedContainer = "container:tl2swift.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -40,7 +40,8 @@
       buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
-      shouldUseLaunchSchemeArgsEnv = "YES">
+      shouldUseLaunchSchemeArgsEnv = "YES"
+      codeCoverageEnabled = "YES">
       <Testables>
          <TestableReference
             skipped = "NO">

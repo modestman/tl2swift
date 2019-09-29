@@ -1,11 +1,12 @@
 import Foundation
 import PathKit
-import tl_parser_lib
+import TlParserLib
 
 let args = ProcessInfo.processInfo.arguments
 
-guard args.count >= 2 else {
-    preconditionFailure("Invalid number of arguments")
+if args.count == 1 || args[1] == "--help" || args[1] == "-h" {
+    print("Usage: \n\ttl2swift api.tl output_dir")
+    exit(0)
 }
 
 let inFile = Path(args[1])
