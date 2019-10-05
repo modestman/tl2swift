@@ -1,6 +1,6 @@
 //
-//  File.swift
-//  
+//  LoggerCimposer.swift
+//  tl_parser_lib
 //
 //  Created by Anton Glezman on 28/09/2019.
 //

@@ -34,7 +34,7 @@ struct TypesHelper {
             "double": "Double",
             "int32": "Int",
             "int53": "Int64",
-            "int64": "String", // in TDLib json int64 passes as string
+            "int64": "TdInt64", // in TDLib json int64 passes as string
             "bytes": "Data"
         ]
         return mapping[tlType]

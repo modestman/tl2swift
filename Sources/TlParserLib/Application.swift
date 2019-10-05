@@ -82,7 +82,12 @@ public final class Application {
             projectName: Constants.project,
             outputDirectory: output.path)
         
-        return [dto, decoder, codingKeys, logger]
+        let tdInt64 = try TdInt64Composer().composeEntityUtilityImplementation(
+            forEntityName: "TdInt64",
+            projectName: Constants.project,
+            outputDirectory: output.path)
+        
+        return [dto, decoder, codingKeys, logger, tdInt64]
     }
     
     private func enumsImplementation(output: URL) throws -> [Implementation] {
