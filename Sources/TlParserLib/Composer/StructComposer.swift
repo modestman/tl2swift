@@ -75,14 +75,14 @@ final class StructComposer: Composer {
         if paramsList.count > 1 {
             let params = paramsList.reduce("", { $0.addLine("\($1),".indent()) })
             result = result
-                .addLine("public init (")
+                .addLine("public init(")
                 .append(String(params.dropLast().dropLast())) // remove \n and ,
-                .addLine(") {")
                 .addBlankLine()
+                .addLine(") {")
         } else if paramsList.count == 1  {
-            result = result.addLine("public init (\(paramsList.first!)) {")
+            result = result.addLine("public init(\(paramsList.first!)) {")
         } else {
-            result = result.addLine("public init () {")
+            return result.addLine("public init() {}")
         }
         
         for param in paramNames {
