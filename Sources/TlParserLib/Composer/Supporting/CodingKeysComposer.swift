@@ -12,7 +12,7 @@ final class CodingKeysComposer: Composer {
     
     override func composeUtilitySourceCode() throws -> String {
         return ""
-        .addLine("enum DtoCodingKeys: String, CodingKey {")
+        .addLine("public enum DtoCodingKeys: String, CodingKey {")
         .addLine("case type = \"@type\"".indent())
         .addLine("case extra = \"@extra\"".indent())
         .addLine("}")

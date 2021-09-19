@@ -71,7 +71,7 @@ final class MethodsComposer: Composer {
             let params = paramsList.reduce("", { $0.addLine("\($1)".indent()) })
             result = result
                 .addLine("public func \(info.name)(")
-                .append(String(params.dropLast()))
+                .append(params)
                 .addLine(") throws {")
         } else {
             result = result.addLine("public func \(info.name)(\(paramsList.first!)) throws {")
@@ -79,7 +79,6 @@ final class MethodsComposer: Composer {
         
         let impl = composeMethodImpl(info)
         result = result
-            .addBlankLine()
             .append(impl.indent())
             .addLine("}")
             .addBlankLine()

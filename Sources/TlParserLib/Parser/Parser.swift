@@ -82,7 +82,10 @@ public final class Parser {
                 var properties = [ClassProperty]()
                 for (name, type) in entityNameAndTypes.types {
                     let desc = entityDesc.params[name]
-                    let optional = desc?.contains("may be null") ?? false
+                    // Any direct or indirect function parameter can be specified to be null.
+                    // In all function null objects are allowed by TDLib in incoming requests.
+                    // https://github.com/tdlib/td/issues/1536
+                    let optional = (desc?.contains("may be null") ?? false) || hitFunctions
                     let prop = ClassProperty(name: name, type: type, description: desc, optional: optional)
                     properties.append(prop)
                 }
